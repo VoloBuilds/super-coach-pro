@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Workout } from '@/types/workout';
 import { WorkoutBuilder } from '@/components/workout/WorkoutBuilder';
 import { LiveWorkout } from '@/components/LiveWorkout';
@@ -11,14 +11,6 @@ export default function Workouts() {
     const [editingWorkout, setEditingWorkout] = useState<Workout | null>(null);
     const [activeWorkout, setActiveWorkout] = useState<Workout | null>(null);
 
-    // Load workouts from local storage on mount
-    useEffect(() => {
-        const savedWorkouts = localStorage.getItem('workouts');
-        if (savedWorkouts) {
-            setWorkouts(JSON.parse(savedWorkouts));
-        }
-    }, []);
-
     const handleSaveWorkout = (workout: Workout) => {
         const updatedWorkouts = editingWorkout
             ? workouts.map(w => w.id === workout.id ? workout : w)
@@ -27,9 +19,6 @@ export default function Workouts() {
         setWorkouts(updatedWorkouts);
         setEditingWorkout(null);
         setIsCreating(false);
-
-        // Save to local storage
-        localStorage.setItem('workouts', JSON.stringify(updatedWorkouts));
     };
 
     const handleCompleteWorkout = (completedWorkout: Workout) => {
@@ -38,7 +27,6 @@ export default function Workouts() {
             w.id === completedWorkout.id ? completedWorkout : w
         );
         setWorkouts(updatedWorkouts);
-        localStorage.setItem('workouts', JSON.stringify(updatedWorkouts));
         
         // Exit live mode
         setActiveWorkout(null);

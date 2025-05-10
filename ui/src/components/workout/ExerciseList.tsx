@@ -1,9 +1,10 @@
 import { useState, useMemo } from 'react';
 import { Exercise } from '@/types/workout';
-import { ExerciseCard } from './ExerciseCard';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { exerciseCategories, muscleGroups } from '@/data/exercises';
+import { Badge } from '@/components/ui/badge';
+import { Card } from '@/components/ui/card';
 
 interface ExerciseListProps {
     exercises: Exercise[];
@@ -38,7 +39,7 @@ export function ExerciseList({ exercises, onSelectExercise, selectedExerciseId }
                 />
                 <Select value={selectedCategory} onValueChange={setSelectedCategory}>
                     <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="Category" />
+                        <SelectValue placeholder="All Categories" />
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem value="all">All Categories</SelectItem>
@@ -51,7 +52,7 @@ export function ExerciseList({ exercises, onSelectExercise, selectedExerciseId }
                 </Select>
                 <Select value={selectedMuscleGroup} onValueChange={setSelectedMuscleGroup}>
                     <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="Muscle Group" />
+                        <SelectValue placeholder="All Muscle Groups" />
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem value="all">All Muscle Groups</SelectItem>
@@ -64,15 +65,60 @@ export function ExerciseList({ exercises, onSelectExercise, selectedExerciseId }
                 </Select>
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {filteredExercises.map((exercise) => (
-                    <ExerciseCard
-                        key={exercise.id}
-                        exercise={exercise}
-                        onClick={() => onSelectExercise(exercise)}
-                        selected={exercise.id === selectedExerciseId}
-                    />
-                ))}
+            <div className="relative">
+                {/* Sticky Headers */}
+                <div className="sticky top-0 bg-background z-10 grid grid-cols-[2.5fr,1fr,2fr,1fr] gap-6 pb-2 border-b">
+                    <div className="text-sm font-medium text-muted-foreground">Exercise</div>
+                    <div className="text-sm font-medium text-muted-foreground">Category</div>
+                    <div className="text-sm font-medium text-muted-foreground">Muscle Groups</div>
+                    <div className="text-sm font-medium text-muted-foreground">Equipment</div>
+                </div>
+
+                <div className="grid gap-4 pt-4">
+                    {filteredExercises.map((exercise) => (
+                        <Card
+                            key={exercise.id}
+                            className={`cursor-pointer transition-all hover:shadow-md ${
+                                exercise.id === selectedExerciseId ? 'border-primary' : ''
+                            }`}
+                            onClick={() => onSelectExercise(exercise)}
+                        >
+                            <div className="p-6">
+                                <div className="grid grid-cols-[2.5fr,1fr,2fr,1fr] gap-6 items-start">
+                                    <div>
+                                        <h3 className="text-lg font-semibold">{exercise.name}</h3>
+                                        {exercise.description && (
+                                            <p className="text-sm text-muted-foreground mt-1">{exercise.description}</p>
+                                        )}
+                                    </div>
+                                    <div className="pt-1">
+                                        <Badge variant="secondary" className="text-sm bg-muted/50">
+                                            {exercise.category}
+                                        </Badge>
+                                    </div>
+                                    <div className="flex flex-wrap gap-2 pt-1">
+                                        {exercise.muscleGroups.map((muscle) => (
+                                            <Badge key={muscle} variant="outline" className="text-sm bg-background">
+                                                {muscle}
+                                            </Badge>
+                                        ))}
+                                    </div>
+                                    <div className="pt-1">
+                                        {exercise.equipment && (
+                                            <div className="flex flex-wrap gap-2">
+                                                {exercise.equipment.map((item) => (
+                                                    <Badge key={item} variant="outline" className="text-sm bg-background">
+                                                        {item}
+                                                    </Badge>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </Card>
+                    ))}
+                </div>
             </div>
 
             {filteredExercises.length === 0 && (
