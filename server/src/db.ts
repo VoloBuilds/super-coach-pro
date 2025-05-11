@@ -4,13 +4,20 @@ export interface Env {
     SUPABASE_URL: string;
     SUPABASE_ANON_KEY: string;
     SUPABASE_SERVICE_ROLE_KEY: string;
+    DB: D1Database;
+    OPENAI_API_KEY: string;
 }
 
 export interface WorkoutData {
     id?: string;
     name: string;
-    description?: string;
-    exercises: any[];
+    description: string;
+    exercises: Array<{
+        name: string;
+        sets: any[];
+        notes: string;
+        restBetweenSets: number;
+    }>;
     estimatedDuration: number;
     user_id?: string;
 }
@@ -119,6 +126,8 @@ class SupabaseDB implements WorkoutDB, MealPlanDB {
 
     async updateWorkout(workoutId: string, workout: WorkoutData, userId: string): Promise<WorkoutData> {
         const workoutData = prepareWorkoutData({ ...workout, user_id: userId });
+        
+        // First try to update
         const { data, error } = await this.client
             .from('workouts')
             .update(workoutData)
@@ -126,6 +135,20 @@ class SupabaseDB implements WorkoutDB, MealPlanDB {
             .eq('user_id', userId)
             .select()
             .single();
+
+        // If no rows affected, create new record
+        if (error?.code === 'PGRST116') {
+            const { data: newData, error: insertError } = await this.client
+                .from('workouts')
+                .insert([{ ...workoutData, id: workoutId }])
+                .select()
+                .single();
+
+            if (insertError) throw insertError;
+            if (!newData) throw new Error('Failed to create workout');
+
+            return transformWorkoutToClientFormat(newData);
+        }
 
         if (error) throw error;
         if (!data) throw new Error('Workout not found or access denied');
@@ -208,8 +231,13 @@ class SupabaseDB implements WorkoutDB, MealPlanDB {
 // Helper function to prepare workout data for database
 interface DatabaseWorkoutData {
     name: string;
-    description?: string;
-    exercises: any[];
+    description: string;
+    exercises: Array<{
+        name: string;
+        sets: any[];
+        notes: string;
+        restBetweenSets: number;
+    }>;
     estimated_duration: number;
     user_id?: string;
 }
@@ -224,10 +252,10 @@ export function prepareWorkoutData(workout: WorkoutData): DatabaseWorkoutData {
 
 // Transform database workout to client format
 export function transformWorkoutToClientFormat(workout: any): WorkoutData {
+    const { estimated_duration, created_at, updated_at, ...rest } = workout;
     return {
-        ...workout,
-        estimatedDuration: Number(workout.estimated_duration),
-        estimated_duration: undefined
+        ...rest,
+        estimatedDuration: Number(estimated_duration)
     };
 }
 

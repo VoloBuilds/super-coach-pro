@@ -2,6 +2,53 @@ import { Exercise, Workout } from '@/types/workout';
 import { MealPlan } from '@/types/diet';
 import { supabase } from './supabase';
 
+// Export the server types
+export interface WorkoutData {
+    name: string;
+    description?: string;
+    exercises: Array<{
+        name: string;
+        sets: Array<{
+            weight?: number;
+            reps?: number;
+            duration?: number;
+            distance?: number;
+            completed: boolean;
+            weightType: 'kg' | 'lbs' | 'bodyweight'
+        }>;
+        notes?: string;
+        restBetweenSets: number;
+    }>;
+    estimatedDuration: number;
+}
+
+export interface MealPlanData {
+    name: string;
+    description?: string;
+    meals: Array<{
+        type: string;
+        name: string;
+        time: string;
+        foods: Array<{
+            name: string;
+            portion: number;
+            unit: string;
+            nutrition: {
+                calories: number;
+                protein: number;
+                carbs: number;
+                fat: number;
+            }
+        }>;
+    }>;
+    totalNutrition: {
+        calories: number;
+        protein: number;
+        carbs: number;
+        fat: number;
+    };
+}
+
 const API_BASE_URL = 'http://localhost:8787'; // Update this based on your deployment environment
 
 export class ServerCommError extends Error {
@@ -178,6 +225,25 @@ export const serverComm = {
         } catch (error: unknown) {
             const message = error instanceof Error ? error.message : 'Unknown error occurred';
             throw new ServerCommError(`Failed to delete meal plan: ${message}`);
+        }
+    },
+
+    async sendChatMessage(message: string): Promise<{ message: string; data?: WorkoutData | MealPlanData }> {
+        try {
+            const headers = await getAuthHeader();
+            const response = await fetch(`${API_BASE_URL}/api/chat`, {
+                method: 'POST',
+                headers,
+                body: JSON.stringify({ message })
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return await response.json();
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : 'Unknown error occurred';
+            throw new ServerCommError(`Failed to send chat message: ${message}`);
         }
     }
 }; 

@@ -66,12 +66,8 @@ export function WorkoutBuilder({ initialWorkout, onSave }: WorkoutBuilderProps) 
             name: workoutName,
             description: '', // Keep empty as we removed description
             exercises: workoutExercises,
-            difficulty: 'beginner' as const, // Default as we removed difficulty selection
-            createdAt: initialWorkout?.createdAt || new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
             estimatedDuration: workoutExercises.reduce((total, ex) => 
                 total + (ex.sets.length * (ex.restBetweenSets + 30)), 0) / 60,
-            tags: [] as string[],
             ...(initialWorkout?.id && { id: initialWorkout.id })
         } as Workout;
         onSave(workout);
@@ -173,7 +169,15 @@ export function WorkoutBuilder({ initialWorkout, onSave }: WorkoutBuilderProps) 
                             </div>
                         ) : (
                             workoutExercises.map((workoutExercise) => {
-                                const exercise = exercises.find(e => e.id === workoutExercise.exerciseId)!;
+                                // For AI-generated exercises, create a minimal Exercise object
+                                const exercise = workoutExercise.name 
+                                    ? { 
+                                        id: workoutExercise.exerciseId,
+                                        name: workoutExercise.name,
+                                        category: 'other',
+                                        muscleGroups: []
+                                    } as Exercise
+                                    : exercises.find(e => e.id === workoutExercise.exerciseId)!;
                                 return (
                                     <div 
                                         key={workoutExercise.id} 

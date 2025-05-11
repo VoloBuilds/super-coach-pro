@@ -23,6 +23,7 @@ export interface ExerciseSet {
 export interface WorkoutExercise {
   id: string;
   exerciseId: string;
+  name?: string;  // Optional name field for AI-generated exercises
   sets: ExerciseSet[];
   notes?: string;
   restBetweenSets: number; // in seconds
@@ -31,15 +32,11 @@ export interface WorkoutExercise {
 export interface Workout {
   id: string;
   name: string;
-  description?: string;
+  description: string;
   exercises: WorkoutExercise[];
-  createdAt: string;
-  updatedAt: string;
   estimatedDuration: number; // in minutes
-  difficulty: 'beginner' | 'intermediate' | 'advanced';
-  tags: string[];
 }
 
-export interface WorkoutTemplate extends Omit<Workout, 'id' | 'createdAt' | 'updatedAt'> {
+export interface WorkoutTemplate extends Omit<Workout, 'id'> {
   id?: string;
 } 

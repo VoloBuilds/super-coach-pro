@@ -49,7 +49,10 @@ export function LiveWorkout({ workout, onComplete, onCancel }: LiveWorkoutProps)
     }, [isPaused, isResting]);
 
     const currentExercise = workout.exercises[currentExerciseIndex];
-    const exercise = exercises.find(e => e.id === currentExercise?.exerciseId);
+    // Get exercise info from either the workoutExercise (AI-generated) or exercises list (manually created)
+    const exercise = currentExercise.name 
+        ? { id: currentExercise.exerciseId, name: currentExercise.name } 
+        : exercises.find(e => e.id === currentExercise?.exerciseId);
 
     const handleCompleteSet = (actualReps?: number, actualWeight?: number) => {
         // Update completed sets
@@ -181,7 +184,10 @@ export function LiveWorkout({ workout, onComplete, onCancel }: LiveWorkoutProps)
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {workout.exercises.map((ex, exIndex) => {
-                    const exerciseInfo = exercises.find(e => e.id === ex.exerciseId)!;
+                    // Get exercise info from either the workoutExercise (AI-generated) or exercises list (manually created)
+                    const exerciseInfo = ex.name 
+                        ? { id: ex.exerciseId, name: ex.name }
+                        : exercises.find(e => e.id === ex.exerciseId)!;
                     return (
                         <Card key={ex.id} className={exIndex === currentExerciseIndex ? 'border-primary' : ''}>
                             <CardHeader>

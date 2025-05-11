@@ -1,11 +1,12 @@
 import { User } from '@supabase/supabase-js';
-import { WorkoutDB, MealPlanDB } from './db';
+import { WorkoutDB, MealPlanDB, Env } from './db';
 
 export interface HandlerContext<T = unknown> {
   db: WorkoutDB & MealPlanDB;
   user: User | null;
   body: T;
   params: Record<string, string>;
+  env: Env;
 }
 
 export interface RouteHandler<T = unknown> {

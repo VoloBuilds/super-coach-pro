@@ -52,6 +52,7 @@ export async function handleRequest(
       user,
       body: request.method !== 'GET' ? await request.json() : undefined,
       params,
+      env
     };
 
     // Execute handler

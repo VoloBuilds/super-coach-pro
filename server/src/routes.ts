@@ -1,6 +1,7 @@
 import { Route } from './types';
 import { workoutHandlers } from './handlers/workouts';
 import { mealPlanHandlers } from './handlers/meal-plans';
+import { chatHandler } from './handlers/chat';
 import { WorkoutData, MealPlanData } from './db';
 
 // Static data
@@ -73,5 +74,9 @@ export const routes: (Route<any>)[] = [
   {
     path: '/api/meal-plans/{id}',
     handler: mealPlanHandlers
-  } as Route<MealPlanData>
+  } as Route<MealPlanData>,
+  {
+    path: '/api/chat',
+    handler: chatHandler
+  } as Route<any>
 ]; 

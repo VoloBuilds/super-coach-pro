@@ -57,6 +57,7 @@ export function ExerciseForm({ exercise, workoutExercise, onSave, onCancel }: Ex
         onSave({
             id: workoutExercise?.id || crypto.randomUUID(),
             exerciseId: exercise.id,
+            name: workoutExercise?.name || exercise.name,
             sets,
             notes,
             restBetweenSets: restTime
