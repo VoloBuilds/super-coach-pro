@@ -1,35 +1,74 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Workout } from '@/types/workout';
 import { WorkoutBuilder } from '@/components/workout/WorkoutBuilder';
 import { LiveWorkout } from '@/components/LiveWorkout';
 import { Button } from '@/components/ui/button';
 import { Plus, Pencil } from 'lucide-react';
+import { serverComm } from '@/lib/serverComm';
 
 export default function Workouts() {
     const [workouts, setWorkouts] = useState<Workout[]>([]);
     const [isCreating, setIsCreating] = useState(false);
     const [editingWorkout, setEditingWorkout] = useState<Workout | null>(null);
     const [activeWorkout, setActiveWorkout] = useState<Workout | null>(null);
+    const [error, setError] = useState<string | null>(null);
 
-    const handleSaveWorkout = (workout: Workout) => {
-        const updatedWorkouts = editingWorkout
-            ? workouts.map(w => w.id === workout.id ? workout : w)
-            : [...workouts, workout];
+    // Load workouts on component mount
+    useEffect(() => {
+        const loadWorkouts = async () => {
+            try {
+                const fetchedWorkouts = await serverComm.getWorkouts();
+                if (!Array.isArray(fetchedWorkouts)) {
+                    throw new Error('Invalid response format');
+                }
+                setWorkouts(fetchedWorkouts);
+            } catch (err) {
+                setError('Failed to load workouts');
+                console.error('Error loading workouts:', err);
+            }
+        };
+
+        loadWorkouts();
+    }, []);
+
+    const handleSaveWorkout = async (workout: Workout) => {
+        try {
+            // Save to backend - no need to generate ID client-side
+            const savedWorkout = await serverComm.saveWorkout(workout);
             
-        setWorkouts(updatedWorkouts);
-        setEditingWorkout(null);
-        setIsCreating(false);
+            // Update local state
+            const updatedWorkouts = editingWorkout
+                ? workouts.map(w => w.id === savedWorkout.id ? savedWorkout : w)
+                : [...workouts, savedWorkout];
+                
+            setWorkouts(updatedWorkouts);
+            setEditingWorkout(null);
+            setIsCreating(false);
+            setError(null);
+        } catch (err) {
+            setError('Failed to save workout');
+            console.error('Error saving workout:', err);
+        }
     };
 
-    const handleCompleteWorkout = (completedWorkout: Workout) => {
-        // Save completed workout data
-        const updatedWorkouts = workouts.map(w => 
-            w.id === completedWorkout.id ? completedWorkout : w
-        );
-        setWorkouts(updatedWorkouts);
-        
-        // Exit live mode
-        setActiveWorkout(null);
+    const handleCompleteWorkout = async (completedWorkout: Workout) => {
+        try {
+            // Save completed workout data to backend
+            const savedWorkout = await serverComm.saveWorkout(completedWorkout);
+            
+            // Update local state
+            const updatedWorkouts = workouts.map(w => 
+                w.id === savedWorkout.id ? savedWorkout : w
+            );
+            setWorkouts(updatedWorkouts);
+            
+            // Exit live mode
+            setActiveWorkout(null);
+            setError(null);
+        } catch (err) {
+            setError('Failed to save workout completion');
+            console.error('Error completing workout:', err);
+        }
     };
 
     if (activeWorkout) {
@@ -48,6 +87,11 @@ export default function Workouts() {
                 <h1 className="text-2xl font-bold mb-6">
                     {isCreating ? 'Create New Workout' : 'Edit Workout'}
                 </h1>
+                {error && (
+                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                        {error}
+                    </div>
+                )}
                 <WorkoutBuilder
                     initialWorkout={editingWorkout || undefined}
                     onSave={handleSaveWorkout}
@@ -65,6 +109,12 @@ export default function Workouts() {
                     Create Workout
                 </Button>
             </div>
+
+            {error && (
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                    {error}
+                </div>
+            )}
 
             {workouts.length === 0 ? (
                 <div className="text-center py-12">

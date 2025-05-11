@@ -62,18 +62,18 @@ export function WorkoutBuilder({ initialWorkout, onSave }: WorkoutBuilderProps) 
     };
 
     const handleSaveWorkout = () => {
-        const workout: Workout = {
-            id: initialWorkout?.id || crypto.randomUUID(),
+        const workout = {
             name: workoutName,
             description: '', // Keep empty as we removed description
             exercises: workoutExercises,
-            difficulty: 'beginner', // Default as we removed difficulty selection
+            difficulty: 'beginner' as const, // Default as we removed difficulty selection
             createdAt: initialWorkout?.createdAt || new Date().toISOString(),
             updatedAt: new Date().toISOString(),
             estimatedDuration: workoutExercises.reduce((total, ex) => 
                 total + (ex.sets.length * (ex.restBetweenSets + 30)), 0) / 60,
-            tags: []
-        };
+            tags: [] as string[],
+            ...(initialWorkout?.id && { id: initialWorkout.id })
+        } as Workout;
         onSave(workout);
     };
 

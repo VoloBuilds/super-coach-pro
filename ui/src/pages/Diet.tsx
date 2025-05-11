@@ -1,22 +1,48 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { MealPlan } from '@/types/diet';
 import { MealPlanBuilder } from '@/components/diet/MealPlanBuilder';
 import { Button } from '@/components/ui/button';
 import { Plus, Pencil } from 'lucide-react';
+import { serverComm } from '@/lib/serverComm';
 
 export default function Diet() {
     const [mealPlans, setMealPlans] = useState<MealPlan[]>([]);
     const [isCreating, setIsCreating] = useState(false);
     const [editingMealPlan, setEditingMealPlan] = useState<MealPlan | null>(null);
+    const [error, setError] = useState<string | null>(null);
 
-    const handleSaveMealPlan = (mealPlan: MealPlan) => {
-        const updatedMealPlans = editingMealPlan
-            ? mealPlans.map(mp => mp.id === mealPlan.id ? mealPlan : mp)
-            : [...mealPlans, mealPlan];
+    // Load meal plans on component mount
+    useEffect(() => {
+        const loadMealPlans = async () => {
+            try {
+                const fetchedMealPlans = await serverComm.getMealPlans();
+                setMealPlans(fetchedMealPlans);
+                setError(null);
+            } catch (err) {
+                setError('Failed to load meal plans');
+                console.error('Error loading meal plans:', err);
+            }
+        };
+
+        loadMealPlans();
+    }, []);
+
+    const handleSaveMealPlan = async (mealPlan: MealPlan) => {
+        try {
+            const savedMealPlan = await serverComm.saveMealPlan(mealPlan);
             
-        setMealPlans(updatedMealPlans);
-        setEditingMealPlan(null);
-        setIsCreating(false);
+            const updatedMealPlans = editingMealPlan
+                ? mealPlans.map(mp => mp.id === savedMealPlan.id ? savedMealPlan : mp)
+                : [...mealPlans, savedMealPlan];
+                
+            setMealPlans(updatedMealPlans);
+            setEditingMealPlan(null);
+            setIsCreating(false);
+            setError(null);
+        } catch (err) {
+            setError('Failed to save meal plan');
+            console.error('Error saving meal plan:', err);
+        }
     };
 
     if (isCreating || editingMealPlan) {
@@ -25,6 +51,11 @@ export default function Diet() {
                 <h1 className="text-2xl font-bold mb-6">
                     {isCreating ? 'Create New Meal Plan' : 'Edit Meal Plan'}
                 </h1>
+                {error && (
+                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                        {error}
+                    </div>
+                )}
                 <MealPlanBuilder
                     initialMealPlan={editingMealPlan || undefined}
                     onSave={handleSaveMealPlan}
@@ -46,6 +77,12 @@ export default function Diet() {
                     Create Meal Plan
                 </Button>
             </div>
+
+            {error && (
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                    {error}
+                </div>
+            )}
 
             {mealPlans.length === 0 ? (
                 <div className="text-center py-12">

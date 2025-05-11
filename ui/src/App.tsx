@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { store } from './store/store';
 import { Layout } from './components/layout/Layout';
+import { AuthProvider } from './contexts/AuthContext';
 
 // Lazy load pages
 import { lazy, Suspense } from 'react';
@@ -14,37 +15,39 @@ const Chat = lazy(() => import('./pages/Chat'));
 function App() {
   return (
     <Provider store={store}>
-      <Router>
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route index element={
-              <Suspense fallback={<div>Loading...</div>}>
-                <Home />
-              </Suspense>
-            } />
-            <Route path="workouts" element={
-              <Suspense fallback={<div>Loading...</div>}>
-                <Workouts />
-              </Suspense>
-            } />
-            <Route path="diet" element={
-              <Suspense fallback={<div>Loading...</div>}>
-                <Diet />
-              </Suspense>
-            } />
-            <Route path="calendar" element={
-              <Suspense fallback={<div>Loading...</div>}>
-                <Calendar />
-              </Suspense>
-            } />
-            <Route path="chat" element={
-              <Suspense fallback={<div>Loading...</div>}>
-                <Chat />
-              </Suspense>
-            } />
-          </Route>
-        </Routes>
-      </Router>
+      <AuthProvider>
+        <Router>
+          <Routes>
+            <Route path="/" element={<Layout />}>
+              <Route index element={
+                <Suspense fallback={<div>Loading...</div>}>
+                  <Home />
+                </Suspense>
+              } />
+              <Route path="workouts" element={
+                <Suspense fallback={<div>Loading...</div>}>
+                  <Workouts />
+                </Suspense>
+              } />
+              <Route path="diet" element={
+                <Suspense fallback={<div>Loading...</div>}>
+                  <Diet />
+                </Suspense>
+              } />
+              <Route path="calendar" element={
+                <Suspense fallback={<div>Loading...</div>}>
+                  <Calendar />
+                </Suspense>
+              } />
+              <Route path="chat" element={
+                <Suspense fallback={<div>Loading...</div>}>
+                  <Chat />
+                </Suspense>
+              } />
+            </Route>
+          </Routes>
+        </Router>
+      </AuthProvider>
     </Provider>
   );
 }

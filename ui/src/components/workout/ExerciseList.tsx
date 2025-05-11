@@ -5,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { exerciseCategories, muscleGroups } from '@/data/exercises';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
+import { Spinner } from '../ui/spinner';
 
 interface ExerciseListProps {
     exercises: Exercise[];
