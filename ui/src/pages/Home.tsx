@@ -1,7 +1,28 @@
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { AuthModal } from '@/components/auth/AuthModal';
 
 export default function Home() {
+  const { user } = useAuth();
+  const location = useLocation();
   const navigate = useNavigate();
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+  // Check if we were redirected here from a protected route
+  useEffect(() => {
+    const from = location.state?.from;
+    if (from && !user) {
+      setIsAuthModalOpen(true);
+    }
+  }, [location.state, user]);
+
+  // If user becomes authenticated, redirect them to their intended destination
+  useEffect(() => {
+    if (user && location.state?.from) {
+      navigate(location.state.from.pathname);
+    }
+  }, [user, location.state, navigate]);
 
   return (
     <div className="space-y-6">
@@ -39,6 +60,7 @@ export default function Home() {
           <p className="text-muted-foreground">Get personalized recommendations</p>
         </div>
       </div>
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
     </div>
   );
 } 

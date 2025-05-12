@@ -3,6 +3,7 @@ import { Provider } from 'react-redux';
 import { store } from './store/store';
 import { Layout } from './components/layout/Layout';
 import { AuthProvider } from './contexts/AuthContext';
+import { ProtectedRoute } from './components/auth/ProtectedRoute';
 
 // Lazy load pages
 import { lazy, Suspense } from 'react';
@@ -25,24 +26,32 @@ function App() {
                 </Suspense>
               } />
               <Route path="workouts" element={
-                <Suspense fallback={<div>Loading...</div>}>
-                  <Workouts />
-                </Suspense>
+                <ProtectedRoute>
+                  <Suspense fallback={<div>Loading...</div>}>
+                    <Workouts />
+                  </Suspense>
+                </ProtectedRoute>
               } />
               <Route path="diet" element={
-                <Suspense fallback={<div>Loading...</div>}>
-                  <Diet />
-                </Suspense>
+                <ProtectedRoute>
+                  <Suspense fallback={<div>Loading...</div>}>
+                    <Diet />
+                  </Suspense>
+                </ProtectedRoute>
               } />
               <Route path="calendar" element={
-                <Suspense fallback={<div>Loading...</div>}>
-                  <Calendar />
-                </Suspense>
+                <ProtectedRoute>
+                  <Suspense fallback={<div>Loading...</div>}>
+                    <Calendar />
+                  </Suspense>
+                </ProtectedRoute>
               } />
               <Route path="chat" element={
-                <Suspense fallback={<div>Loading...</div>}>
-                  <Chat />
-                </Suspense>
+                <ProtectedRoute>
+                  <Suspense fallback={<div>Loading...</div>}>
+                    <Chat />
+                  </Suspense>
+                </ProtectedRoute>
               } />
             </Route>
           </Routes>
