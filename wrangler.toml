@@ -1,0 +1,4 @@
+[build]
+command = "cd ui && npm install --platform=linux --arch=x64 && npm run build"
+[build.environment]
+NODE_VERSION = "20" 
