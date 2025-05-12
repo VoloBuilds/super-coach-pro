@@ -1,5 +1,6 @@
 import { Exercise, Workout } from '@/types/workout';
 import { MealPlan } from '@/types/diet';
+import { WorkoutSchedule } from '@/types/schedule';
 import { supabase } from './supabase';
 
 // Export the server types
@@ -49,7 +50,15 @@ export interface MealPlanData {
     };
 }
 
-const API_BASE_URL = 'https://supercoachpro-api.volobuilds1.workers.dev'; // Update this based on your deployment environment
+export interface WorkoutScheduleData {
+    workoutId: string;
+    date: string;
+    recurrence: 'once' | 'weekly';
+    daysOfWeek?: string[];
+}
+
+// const API_BASE_URL = 'https://supercoachpro-api.volobuilds1.workers.dev'; // Update this based on your deployment environment
+const API_BASE_URL = 'http://localhost:8787';
 
 export class ServerCommError extends Error {
     constructor(message: string) {
@@ -244,6 +253,68 @@ export const serverComm = {
         } catch (error: unknown) {
             const message = error instanceof Error ? error.message : 'Unknown error occurred';
             throw new ServerCommError(`Failed to send chat message: ${message}`);
+        }
+    },
+
+    async getScheduledWorkouts(): Promise<WorkoutSchedule[]> {
+        try {
+            const headers = await getAuthHeader();
+            const response = await fetch(`${API_BASE_URL}/api/workout-schedules`, { headers });
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            console.log('Raw schedule response:', data);
+            
+            // Ensure we always return an array
+            if (!Array.isArray(data)) {
+                console.warn('Schedule response is not an array:', data);
+                return [];
+            }
+            
+            return data;
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : 'Unknown error occurred';
+            console.error('Failed to fetch scheduled workouts:', error);
+            throw new ServerCommError(`Failed to fetch scheduled workouts: ${message}`);
+        }
+    },
+
+    async scheduleWorkout(schedule: WorkoutScheduleData): Promise<WorkoutSchedule> {
+        try {
+            const headers = await getAuthHeader();
+            const response = await fetch(`${API_BASE_URL}/api/workout-schedules`, {
+                method: 'POST',
+                headers: {
+                    ...headers,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(schedule)
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return await response.json();
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : 'Unknown error occurred';
+            throw new ServerCommError(`Failed to schedule workout: ${message}`);
+        }
+    },
+
+    async deleteScheduledWorkout(scheduleId: string): Promise<void> {
+        try {
+            const headers = await getAuthHeader();
+            const response = await fetch(`${API_BASE_URL}/api/workout-schedules/${scheduleId}`, {
+                method: 'DELETE',
+                headers
+            });
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : 'Unknown error occurred';
+            throw new ServerCommError(`Failed to delete scheduled workout: ${message}`);
         }
     }
 }; 

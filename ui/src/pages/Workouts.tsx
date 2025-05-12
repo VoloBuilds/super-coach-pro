@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Workout } from '@/types/workout';
 import { WorkoutBuilder } from '@/components/workout/WorkoutBuilder';
 import { LiveWorkout } from '@/components/LiveWorkout';
@@ -12,6 +13,7 @@ export default function Workouts() {
     const [editingWorkout, setEditingWorkout] = useState<Workout | null>(null);
     const [activeWorkout, setActiveWorkout] = useState<Workout | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const location = useLocation();
 
     // Load workouts on component mount
     useEffect(() => {
@@ -22,6 +24,14 @@ export default function Workouts() {
                     throw new Error('Invalid response format');
                 }
                 setWorkouts(fetchedWorkouts);
+
+                // Check if we should start a specific workout
+                const state = location.state as { startWorkout?: Workout };
+                if (state?.startWorkout) {
+                    setActiveWorkout(state.startWorkout);
+                    // Clear the state to prevent starting the workout again on refresh
+                    window.history.replaceState({}, document.title);
+                }
             } catch (err) {
                 setError('Failed to load workouts');
                 console.error('Error loading workouts:', err);
@@ -29,7 +39,7 @@ export default function Workouts() {
         };
 
         loadWorkouts();
-    }, []);
+    }, [location]);
 
     const handleSaveWorkout = async (workout: Workout) => {
         try {

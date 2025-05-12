@@ -2,7 +2,8 @@ import { Route } from './types';
 import { workoutHandlers } from './handlers/workouts';
 import { mealPlanHandlers } from './handlers/meal-plans';
 import { chatHandler } from './handlers/chat';
-import { WorkoutData, MealPlanData } from './db';
+import { WorkoutData, MealPlanData, WorkoutScheduleData } from './db';
+import { workoutScheduleHandlers } from 'handlers/workout-schedules';
 
 // Static data
 const exercises = [
@@ -67,6 +68,14 @@ export const routes: (Route<any>)[] = [
     path: '/api/workouts/{id}',
     handler: workoutHandlers
   } as Route<WorkoutData>,
+  {
+    path: '/api/workout-schedules',
+    handler: workoutScheduleHandlers
+  } as Route<WorkoutScheduleData>,
+  {
+    path: '/api/workout-schedules/{id}',
+    handler: workoutScheduleHandlers
+  } as Route<WorkoutScheduleData>,
   {
     path: '/api/meal-plans',
     handler: mealPlanHandlers

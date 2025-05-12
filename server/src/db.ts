@@ -75,12 +75,29 @@ export interface MealPlanData {
     updatedAt?: string;
 }
 
+export interface WorkoutScheduleData {
+    id?: string;
+    workoutId: string;
+    workout_id?: string;
+    userId?: string;
+    user_id?: string;
+    date: string;
+    recurrence: 'once' | 'weekly';
+    daysOfWeek?: string[];
+    days_of_week?: string[];
+    createdAt?: string;
+    updatedAt?: string;
+}
+
 // Database interface for workouts
 export interface WorkoutDB {
     getWorkouts(userId: string): Promise<WorkoutData[]>;
     createWorkout(workout: WorkoutData): Promise<WorkoutData>;
     updateWorkout(workoutId: string, workout: WorkoutData, userId: string): Promise<WorkoutData>;
     deleteWorkout(workoutId: string, userId: string): Promise<void>;
+    getWorkoutSchedules(userId: string): Promise<WorkoutScheduleData[]>;
+    createWorkoutSchedule(schedule: WorkoutScheduleData): Promise<WorkoutScheduleData>;
+    deleteWorkoutSchedule(scheduleId: string, userId: string): Promise<void>;
 }
 
 // Database interface for meal plans
@@ -93,9 +110,13 @@ export interface MealPlanDB {
 
 class SupabaseDB implements WorkoutDB, MealPlanDB {
     private client: SupabaseClient;
+    private authClient: SupabaseClient;
 
     constructor(env: Env) {
+        // Service role client for database operations
         this.client = createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY);
+        // Anon key client for auth operations
+        this.authClient = createClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY);
     }
 
     async getWorkouts(userId: string): Promise<WorkoutData[]> {
@@ -219,12 +240,48 @@ class SupabaseDB implements WorkoutDB, MealPlanDB {
     }
 
     async getUser(token: string): Promise<User | null> {
-        const { data: { user }, error } = await this.client.auth.getUser(token);
+        const { data: { user }, error } = await this.authClient.auth.getUser(token);
         if (error) {
             console.error('Error getting user:', error);
             return null;
         }
         return user;
+    }
+
+    async getWorkoutSchedules(userId: string): Promise<WorkoutScheduleData[]> {
+        const { data, error } = await this.client
+            .from('workout_schedules')
+            .select('*')
+            .eq('user_id', userId);
+
+        if (error) throw error;
+        if (!data) return [];
+
+        return data.map(transformWorkoutScheduleToClientFormat);
+    }
+
+    async createWorkoutSchedule(schedule: WorkoutScheduleData): Promise<WorkoutScheduleData> {
+        const scheduleData = prepareWorkoutScheduleData(schedule);
+        const { data, error } = await this.client
+            .from('workout_schedules')
+            .insert([scheduleData])
+            .select()
+            .single();
+
+        if (error) throw error;
+        if (!data) throw new Error('Failed to create workout schedule');
+
+        return transformWorkoutScheduleToClientFormat(data);
+    }
+
+    async deleteWorkoutSchedule(scheduleId: string, userId: string): Promise<void> {
+        const { error } = await this.client
+            .from('workout_schedules')
+            .delete()
+            .eq('id', scheduleId)
+            .eq('user_id', userId);
+
+        if (error) throw error;
     }
 }
 
@@ -301,6 +358,28 @@ export function transformMealPlanToClientFormat(data: MealPlanData): MealPlanDat
             fat: Number(total_nutrition.fat)
         },
         meals: mealsRecord,
+        createdAt: created_at,
+        updatedAt: updated_at
+    };
+}
+
+export function prepareWorkoutScheduleData(schedule: WorkoutScheduleData): Partial<WorkoutScheduleData> {
+    const { id, createdAt, updatedAt, daysOfWeek, workoutId, userId, user_id, ...data } = schedule;
+    return {
+        ...data,
+        workout_id: workoutId,
+        user_id: user_id || userId,  // Use user_id if available, fall back to userId
+        days_of_week: daysOfWeek
+    };
+}
+
+export function transformWorkoutScheduleToClientFormat(data: any): WorkoutScheduleData {
+    const { workout_id, user_id, days_of_week, created_at, updated_at, ...rest } = data;
+    return {
+        ...rest,
+        workoutId: workout_id,
+        userId: user_id,
+        daysOfWeek: days_of_week,
         createdAt: created_at,
         updatedAt: updated_at
     };
