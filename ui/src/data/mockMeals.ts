@@ -1,6 +1,17 @@
 import { Meal, MealType } from '@/types/diet';
 import { mockFoods } from './mockFoods';
 
+function getDefaultTimeForMealType(type: MealType): string {
+  switch (type) {
+    case 'breakfast': return '08:00';
+    case 'morning-snack': return '10:30';
+    case 'lunch': return '12:00';
+    case 'afternoon-snack': return '15:30';
+    case 'dinner': return '18:00';
+    case 'evening-snack': return '20:30';
+  }
+}
+
 export const mealBank: { type: MealType; meal: Meal }[] = [
   // Breakfast Options
   {
@@ -8,6 +19,7 @@ export const mealBank: { type: MealType; meal: Meal }[] = [
     meal: {
       id: 'oatmeal-breakfast',
       name: 'Oatmeal with Fruit',
+      time: getDefaultTimeForMealType('breakfast'),
       items: [
         {
           id: '1',
@@ -27,6 +39,7 @@ export const mealBank: { type: MealType; meal: Meal }[] = [
     meal: {
       id: 'protein-breakfast',
       name: 'High Protein Breakfast',
+      time: getDefaultTimeForMealType('breakfast'),
       items: [
         {
           id: '1',
@@ -41,6 +54,7 @@ export const mealBank: { type: MealType; meal: Meal }[] = [
     meal: {
       id: 'light-protein-breakfast',
       name: 'Light Protein Breakfast',
+      time: getDefaultTimeForMealType('breakfast'),
       items: [
         {
           id: '1',
@@ -60,6 +74,7 @@ export const mealBank: { type: MealType; meal: Meal }[] = [
     meal: {
       id: 'fruit-breakfast',
       name: 'Fresh Fruit Breakfast',
+      time: getDefaultTimeForMealType('breakfast'),
       items: [
         {
           id: '1',
@@ -81,6 +96,7 @@ export const mealBank: { type: MealType; meal: Meal }[] = [
     meal: {
       id: 'chicken-rice-lunch',
       name: 'Chicken and Rice Bowl',
+      time: getDefaultTimeForMealType('lunch'),
       items: [
         {
           id: '1',
@@ -105,6 +121,7 @@ export const mealBank: { type: MealType; meal: Meal }[] = [
     meal: {
       id: 'salmon-lunch',
       name: 'Salmon with Sweet Potato',
+      time: getDefaultTimeForMealType('lunch'),
       items: [
         {
           id: '1',
@@ -129,6 +146,7 @@ export const mealBank: { type: MealType; meal: Meal }[] = [
     meal: {
       id: 'light-chicken-lunch',
       name: 'Light Chicken and Vegetables',
+      time: getDefaultTimeForMealType('lunch'),
       items: [
         {
           id: '1',
@@ -153,6 +171,7 @@ export const mealBank: { type: MealType; meal: Meal }[] = [
     meal: {
       id: 'salmon-rice-lunch',
       name: 'Salmon Rice Bowl',
+      time: getDefaultTimeForMealType('lunch'),
       items: [
         {
           id: '1',
@@ -184,6 +203,7 @@ export const mealBank: { type: MealType; meal: Meal }[] = [
     meal: {
       id: 'light-dinner',
       name: 'Light Protein Dinner',
+      time: getDefaultTimeForMealType('dinner'),
       items: [
         {
           id: '1',
@@ -208,6 +228,7 @@ export const mealBank: { type: MealType; meal: Meal }[] = [
     meal: {
       id: 'salmon-veggie-dinner',
       name: 'Salmon and Vegetables',
+      time: getDefaultTimeForMealType('dinner'),
       items: [
         {
           id: '1',
@@ -232,6 +253,7 @@ export const mealBank: { type: MealType; meal: Meal }[] = [
     meal: {
       id: 'chicken-sweet-potato-dinner',
       name: 'Chicken with Sweet Potato',
+      time: getDefaultTimeForMealType('dinner'),
       items: [
         {
           id: '1',
@@ -256,6 +278,7 @@ export const mealBank: { type: MealType; meal: Meal }[] = [
     meal: {
       id: 'protein-rice-dinner',
       name: 'Protein Rice Bowl',
+      time: getDefaultTimeForMealType('dinner'),
       items: [
         {
           id: '1',
@@ -282,6 +305,7 @@ export const mealBank: { type: MealType; meal: Meal }[] = [
     meal: {
       id: 'fruit-yogurt-morning',
       name: 'Fruit and Yogurt',
+      time: getDefaultTimeForMealType('morning-snack'),
       items: [
         {
           id: '1',
@@ -301,6 +325,7 @@ export const mealBank: { type: MealType; meal: Meal }[] = [
     meal: {
       id: 'protein-morning',
       name: 'Protein Snack',
+      time: getDefaultTimeForMealType('morning-snack'),
       items: [
         {
           id: '1',
@@ -315,6 +340,7 @@ export const mealBank: { type: MealType; meal: Meal }[] = [
     meal: {
       id: 'fruit-morning',
       name: 'Fresh Fruit',
+      time: getDefaultTimeForMealType('morning-snack'),
       items: [
         {
           id: '1',
@@ -331,6 +357,7 @@ export const mealBank: { type: MealType; meal: Meal }[] = [
     meal: {
       id: 'sweet-potato-afternoon',
       name: 'Sweet Potato Snack',
+      time: getDefaultTimeForMealType('afternoon-snack'),
       items: [
         {
           id: '1',
@@ -345,6 +372,7 @@ export const mealBank: { type: MealType; meal: Meal }[] = [
     meal: {
       id: 'fruit-afternoon',
       name: 'Fresh Fruit',
+      time: getDefaultTimeForMealType('afternoon-snack'),
       items: [
         {
           id: '1',
@@ -359,6 +387,7 @@ export const mealBank: { type: MealType; meal: Meal }[] = [
     meal: {
       id: 'protein-afternoon',
       name: 'Protein Boost',
+      time: getDefaultTimeForMealType('afternoon-snack'),
       items: [
         {
           id: '1',
@@ -375,6 +404,7 @@ export const mealBank: { type: MealType; meal: Meal }[] = [
     meal: {
       id: 'light-yogurt-evening',
       name: 'Light Yogurt',
+      time: getDefaultTimeForMealType('evening-snack'),
       items: [
         {
           id: '1',
@@ -389,6 +419,7 @@ export const mealBank: { type: MealType; meal: Meal }[] = [
     meal: {
       id: 'veggie-evening',
       name: 'Veggie Snack',
+      time: getDefaultTimeForMealType('evening-snack'),
       items: [
         {
           id: '1',
@@ -408,6 +439,7 @@ export const mealBank: { type: MealType; meal: Meal }[] = [
     meal: {
       id: 'light-sweet-potato-evening',
       name: 'Light Sweet Potato',
+      time: getDefaultTimeForMealType('evening-snack'),
       items: [
         {
           id: '1',

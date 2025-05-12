@@ -4,6 +4,7 @@ export const exercises: Exercise[] = [
   {
     id: 'bench-press',
     name: 'Bench Press',
+    category: 'strength',
     description: 'Lie on bench and press barbell up',
     muscleGroups: ['chest', 'shoulders', 'triceps'],
     equipment: ['barbell', 'bench']
@@ -11,6 +12,7 @@ export const exercises: Exercise[] = [
   {
     id: 'squat',
     name: 'Squat',
+    category: 'strength',
     description: 'Stand with barbell on shoulders and squat down',
     muscleGroups: ['quadriceps', 'hamstrings', 'glutes'],
     equipment: ['barbell', 'rack']
@@ -18,6 +20,7 @@ export const exercises: Exercise[] = [
   {
     id: 'deadlift',
     name: 'Deadlift',
+    category: 'strength',
     description: 'Lift barbell from ground to hips',
     muscleGroups: ['back', 'hamstrings', 'glutes'],
     equipment: ['barbell']
@@ -25,6 +28,7 @@ export const exercises: Exercise[] = [
   {
     id: 'pull-up',
     name: 'Pull-up',
+    category: 'strength',
     description: 'Pull yourself up to bar',
     muscleGroups: ['back', 'biceps'],
     equipment: ['pull-up bar']
@@ -38,33 +42,37 @@ export const workoutTemplates: WorkoutTemplate[] = [
     description: 'Complete full body workout focusing on compound movements',
     exercises: [
       {
-        exercise: exercises[0],
+        id: crypto.randomUUID(),
+        exerciseId: exercises[0].id,
         sets: [
-          { reps: 8, weight: 135, isComplete: false },
-          { reps: 8, weight: 135, isComplete: false },
-          { reps: 8, weight: 135, isComplete: false }
+          { id: crypto.randomUUID(), reps: 8, weight: 135, completed: false, weightType: 'kg' },
+          { id: crypto.randomUUID(), reps: 8, weight: 135, completed: false, weightType: 'kg' },
+          { id: crypto.randomUUID(), reps: 8, weight: 135, completed: false, weightType: 'kg' }
         ],
-        restTimeInSeconds: 90
+        restBetweenSets: 90
       },
       {
-        exercise: exercises[1],
+        id: crypto.randomUUID(),
+        exerciseId: exercises[1].id,
         sets: [
-          { reps: 8, weight: 185, isComplete: false },
-          { reps: 8, weight: 185, isComplete: false },
-          { reps: 8, weight: 185, isComplete: false }
+          { id: crypto.randomUUID(), reps: 8, weight: 185, completed: false, weightType: 'kg' },
+          { id: crypto.randomUUID(), reps: 8, weight: 185, completed: false, weightType: 'kg' },
+          { id: crypto.randomUUID(), reps: 8, weight: 185, completed: false, weightType: 'kg' }
         ],
-        restTimeInSeconds: 120
+        restBetweenSets: 120
       },
       {
-        exercise: exercises[2],
+        id: crypto.randomUUID(),
+        exerciseId: exercises[2].id,
         sets: [
-          { reps: 8, weight: 225, isComplete: false },
-          { reps: 8, weight: 225, isComplete: false },
-          { reps: 8, weight: 225, isComplete: false }
+          { id: crypto.randomUUID(), reps: 8, weight: 225, completed: false, weightType: 'kg' },
+          { id: crypto.randomUUID(), reps: 8, weight: 225, completed: false, weightType: 'kg' },
+          { id: crypto.randomUUID(), reps: 8, weight: 225, completed: false, weightType: 'kg' }
         ],
-        restTimeInSeconds: 120
+        restBetweenSets: 120
       }
-    ]
+    ],
+    estimatedDuration: 45
   },
   {
     id: '2',
@@ -72,24 +80,27 @@ export const workoutTemplates: WorkoutTemplate[] = [
     description: 'Upper body strength training session',
     exercises: [
       {
-        exercise: exercises[0],
+        id: crypto.randomUUID(),
+        exerciseId: exercises[0].id,
         sets: [
-          { reps: 10, weight: 135, isComplete: false },
-          { reps: 10, weight: 135, isComplete: false },
-          { reps: 10, weight: 135, isComplete: false }
+          { id: crypto.randomUUID(), reps: 10, weight: 135, completed: false, weightType: 'kg' },
+          { id: crypto.randomUUID(), reps: 10, weight: 135, completed: false, weightType: 'kg' },
+          { id: crypto.randomUUID(), reps: 10, weight: 135, completed: false, weightType: 'kg' }
         ],
-        restTimeInSeconds: 90
+        restBetweenSets: 90
       },
       {
-        exercise: exercises[3],
+        id: crypto.randomUUID(),
+        exerciseId: exercises[3].id,
         sets: [
-          { reps: 8, weight: 0, isComplete: false },
-          { reps: 8, weight: 0, isComplete: false },
-          { reps: 8, weight: 0, isComplete: false }
+          { id: crypto.randomUUID(), reps: 8, weight: 0, completed: false, weightType: 'bodyweight' },
+          { id: crypto.randomUUID(), reps: 8, weight: 0, completed: false, weightType: 'bodyweight' },
+          { id: crypto.randomUUID(), reps: 8, weight: 0, completed: false, weightType: 'bodyweight' }
         ],
-        restTimeInSeconds: 90
+        restBetweenSets: 90
       }
-    ]
+    ],
+    estimatedDuration: 30
   }
 ];
 
@@ -133,11 +144,7 @@ export const workouts: Workout[] = [
         restBetweenSets: 120
       }
     ],
-    createdAt: '2024-03-10T08:00:00Z',
-    updatedAt: '2024-03-10T09:15:00Z',
-    estimatedDuration: 45,
-    difficulty: 'intermediate',
-    tags: []
+    estimatedDuration: 45
   },
   {
     id: '2',
@@ -167,10 +174,6 @@ export const workouts: Workout[] = [
         restBetweenSets: 90
       }
     ],
-    createdAt: '2024-03-08T16:00:00Z',
-    updatedAt: '2024-03-08T17:00:00Z',
-    estimatedDuration: 30,
-    difficulty: 'intermediate',
-    tags: []
+    estimatedDuration: 30
   }
 ]; 

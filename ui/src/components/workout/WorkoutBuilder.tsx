@@ -51,7 +51,7 @@ export function WorkoutBuilder({ initialWorkout, onSave }: WorkoutBuilderProps) 
         setWorkoutExercises(workoutExercises.filter(ex => ex.id !== exerciseId));
     };
 
-    const handleEditExercise = (exercise: Exercise, workoutExercise: WorkoutExercise) => {
+    const handleEditExercise = (exercise: Exercise) => {
         setSelectedExercise(exercise);
         setIsDialogOpen(true);
     };
@@ -71,11 +71,6 @@ export function WorkoutBuilder({ initialWorkout, onSave }: WorkoutBuilderProps) 
             ...(initialWorkout?.id && { id: initialWorkout.id })
         } as Workout;
         onSave(workout);
-    };
-
-    const handleDialogClose = () => {
-        setIsDialogOpen(false);
-        setSelectedExercise(null);
     };
 
     return (
@@ -182,7 +177,7 @@ export function WorkoutBuilder({ initialWorkout, onSave }: WorkoutBuilderProps) 
                                     <div 
                                         key={workoutExercise.id} 
                                         className="flex items-center justify-between p-2 border rounded hover:bg-accent cursor-pointer"
-                                        onClick={() => handleEditExercise(exercise, workoutExercise)}
+                                        onClick={() => handleEditExercise(exercise)}
                                     >
                                         <div>
                                             <div className="font-medium">{exercise.name}</div>

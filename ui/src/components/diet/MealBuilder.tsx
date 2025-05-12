@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FoodItem, Meal, MealItem, MealType } from '@/types/diet';
+import { FoodItem, Meal, MealItem } from '@/types/diet';
 import { mockFoods } from '@/data/mockFoods';
 import { FoodCard } from './FoodCard';
 import { Button } from '@/components/ui/button';

@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Workout, WorkoutExercise, ExerciseSet } from '@/types/workout';
+import { Workout } from '@/types/workout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { exercises } from '@/data/exercises';
-import { PlayCircle, PauseCircle, StopCircle, RotateCcw } from 'lucide-react';
+import { PlayCircle, PauseCircle, StopCircle } from 'lucide-react';
 
 interface LiveWorkoutProps {
     workout: Workout;

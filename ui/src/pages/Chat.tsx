@@ -14,12 +14,6 @@ interface Message {
   data?: Workout | MealPlan;
 }
 
-interface ChatResponse {
-  message: string;
-  data?: Workout | MealPlan;
-  history: Message[];
-}
-
 const transformServerWorkout = (data: any): Workout => ({
   id: crypto.randomUUID(),
   name: data.name,
@@ -74,7 +68,7 @@ const WorkoutDisplay = ({ workout }: { workout: Workout }) => (
       <div className="mt-2">
         <p className="text-sm">Duration: {workout.estimatedDuration} minutes</p>
         <div className="mt-2">
-          {workout.exercises.map((exercise, i) => (
+          {workout.exercises.map((exercise) => (
             <div key={exercise.id} className="mb-2">
               <p className="font-medium">{exercise.exerciseId}</p>
               <ul className="text-sm pl-4">
@@ -142,7 +136,7 @@ export default function Chat() {
 
   const handleSaveWorkout = async (workout: Workout) => {
     try {
-      const savedWorkout = await serverComm.saveWorkout(workout);
+      await serverComm.saveWorkout(workout);
       toast({
         title: "Success",
         description: "Workout plan saved successfully!",
@@ -159,7 +153,7 @@ export default function Chat() {
 
   const handleSaveMealPlan = async (mealPlan: MealPlan) => {
     try {
-      const savedMealPlan = await serverComm.saveMealPlan(mealPlan);
+      await serverComm.saveMealPlan(mealPlan);
       toast({
         title: "Success",
         description: "Meal plan saved successfully!",
