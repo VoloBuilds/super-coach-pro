@@ -49,7 +49,7 @@ export interface MealPlanData {
     };
 }
 
-const API_BASE_URL = 'http://localhost:8787'; // Update this based on your deployment environment
+const API_BASE_URL = 'https://supercoachpro-api.volobuilds1.workers.dev/'; // Update this based on your deployment environment
 
 export class ServerCommError extends Error {
     constructor(message: string) {
