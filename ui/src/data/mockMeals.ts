@@ -1,6 +1,16 @@
 import { Meal, MealType } from '@/types/diet';
 import { mockFoods } from './mockFoods';
 
+const foodMap = new Map(mockFoods.map(food => [food.name, food]));
+
+function getFoodItem(name: string) {
+  const food = foodMap.get(name);
+  if (!food) {
+    throw new Error(`Food item '${name}' not found`);
+  }
+  return food;
+}
+
 function getDefaultTimeForMealType(type: MealType): string {
   switch (type) {
     case 'breakfast': return '08:00';
@@ -23,12 +33,12 @@ export const mealBank: { type: MealType; meal: Meal }[] = [
       items: [
         {
           id: '1',
-          foodItem: mockFoods.find(f => f.name === 'Greek Yogurt')!,
+          foodItem: getFoodItem('Greek Yogurt'),
           quantity: 1
         },
         {
           id: '2',
-          foodItem: mockFoods.find(f => f.name === 'Banana')!,
+          foodItem: getFoodItem('Banana'),
           quantity: 1
         }
       ]
@@ -43,7 +53,7 @@ export const mealBank: { type: MealType; meal: Meal }[] = [
       items: [
         {
           id: '1',
-          foodItem: mockFoods.find(f => f.name === 'Greek Yogurt')!,
+          foodItem: getFoodItem('Greek Yogurt'),
           quantity: 2
         }
       ]
@@ -58,12 +68,12 @@ export const mealBank: { type: MealType; meal: Meal }[] = [
       items: [
         {
           id: '1',
-          foodItem: mockFoods.find(f => f.name === 'Greek Yogurt')!,
+          foodItem: getFoodItem('Greek Yogurt'),
           quantity: 1.5
         },
         {
           id: '2',
-          foodItem: mockFoods.find(f => f.name === 'Banana')!,
+          foodItem: getFoodItem('Banana'),
           quantity: 0.5
         }
       ]
@@ -78,12 +88,12 @@ export const mealBank: { type: MealType; meal: Meal }[] = [
       items: [
         {
           id: '1',
-          foodItem: mockFoods.find(f => f.name === 'Banana')!,
+          foodItem: getFoodItem('Banana'),
           quantity: 2
         },
         {
           id: '2',
-          foodItem: mockFoods.find(f => f.name === 'Greek Yogurt')!,
+          foodItem: getFoodItem('Greek Yogurt'),
           quantity: 0.5
         }
       ]
@@ -100,17 +110,17 @@ export const mealBank: { type: MealType; meal: Meal }[] = [
       items: [
         {
           id: '1',
-          foodItem: mockFoods.find(f => f.name === 'Chicken Breast')!,
+          foodItem: getFoodItem('Chicken Breast'),
           quantity: 1.5
         },
         {
           id: '2',
-          foodItem: mockFoods.find(f => f.name === 'Brown Rice (Cooked)')!,
+          foodItem: getFoodItem('Brown Rice (Cooked)'),
           quantity: 1.5
         },
         {
           id: '3',
-          foodItem: mockFoods.find(f => f.name === 'Broccoli')!,
+          foodItem: getFoodItem('Broccoli'),
           quantity: 1
         }
       ]
@@ -125,17 +135,17 @@ export const mealBank: { type: MealType; meal: Meal }[] = [
       items: [
         {
           id: '1',
-          foodItem: mockFoods.find(f => f.name === 'Salmon Fillet')!,
+          foodItem: getFoodItem('Salmon Fillet'),
           quantity: 1
         },
         {
           id: '2',
-          foodItem: mockFoods.find(f => f.name === 'Sweet Potato')!,
+          foodItem: getFoodItem('Sweet Potato'),
           quantity: 1
         },
         {
           id: '3',
-          foodItem: mockFoods.find(f => f.name === 'Broccoli')!,
+          foodItem: getFoodItem('Broccoli'),
           quantity: 1
         }
       ]
@@ -150,17 +160,17 @@ export const mealBank: { type: MealType; meal: Meal }[] = [
       items: [
         {
           id: '1',
-          foodItem: mockFoods.find(f => f.name === 'Chicken Breast')!,
+          foodItem: getFoodItem('Chicken Breast'),
           quantity: 1
         },
         {
           id: '2',
-          foodItem: mockFoods.find(f => f.name === 'Broccoli')!,
+          foodItem: getFoodItem('Broccoli'),
           quantity: 2
         },
         {
           id: '3',
-          foodItem: mockFoods.find(f => f.name === 'Olive Oil')!,
+          foodItem: getFoodItem('Olive Oil'),
           quantity: 0.5
         }
       ]
@@ -175,22 +185,22 @@ export const mealBank: { type: MealType; meal: Meal }[] = [
       items: [
         {
           id: '1',
-          foodItem: mockFoods.find(f => f.name === 'Salmon Fillet')!,
+          foodItem: getFoodItem('Salmon Fillet'),
           quantity: 1
         },
         {
           id: '2',
-          foodItem: mockFoods.find(f => f.name === 'Brown Rice (Cooked)')!,
+          foodItem: getFoodItem('Brown Rice (Cooked)'),
           quantity: 1
         },
         {
           id: '3',
-          foodItem: mockFoods.find(f => f.name === 'Broccoli')!,
+          foodItem: getFoodItem('Broccoli'),
           quantity: 1
         },
         {
           id: '4',
-          foodItem: mockFoods.find(f => f.name === 'Olive Oil')!,
+          foodItem: getFoodItem('Olive Oil'),
           quantity: 0.5
         }
       ]
@@ -207,17 +217,17 @@ export const mealBank: { type: MealType; meal: Meal }[] = [
       items: [
         {
           id: '1',
-          foodItem: mockFoods.find(f => f.name === 'Chicken Breast')!,
+          foodItem: getFoodItem('Chicken Breast'),
           quantity: 1
         },
         {
           id: '2',
-          foodItem: mockFoods.find(f => f.name === 'Sweet Potato')!,
+          foodItem: getFoodItem('Sweet Potato'),
           quantity: 0.5
         },
         {
           id: '3',
-          foodItem: mockFoods.find(f => f.name === 'Broccoli')!,
+          foodItem: getFoodItem('Broccoli'),
           quantity: 1.5
         }
       ]
@@ -232,17 +242,17 @@ export const mealBank: { type: MealType; meal: Meal }[] = [
       items: [
         {
           id: '1',
-          foodItem: mockFoods.find(f => f.name === 'Salmon Fillet')!,
+          foodItem: getFoodItem('Salmon Fillet'),
           quantity: 1
         },
         {
           id: '2',
-          foodItem: mockFoods.find(f => f.name === 'Broccoli')!,
+          foodItem: getFoodItem('Broccoli'),
           quantity: 2
         },
         {
           id: '3',
-          foodItem: mockFoods.find(f => f.name === 'Olive Oil')!,
+          foodItem: getFoodItem('Olive Oil'),
           quantity: 0.5
         }
       ]
@@ -257,17 +267,17 @@ export const mealBank: { type: MealType; meal: Meal }[] = [
       items: [
         {
           id: '1',
-          foodItem: mockFoods.find(f => f.name === 'Chicken Breast')!,
+          foodItem: getFoodItem('Chicken Breast'),
           quantity: 1.5
         },
         {
           id: '2',
-          foodItem: mockFoods.find(f => f.name === 'Sweet Potato')!,
+          foodItem: getFoodItem('Sweet Potato'),
           quantity: 1
         },
         {
           id: '3',
-          foodItem: mockFoods.find(f => f.name === 'Olive Oil')!,
+          foodItem: getFoodItem('Olive Oil'),
           quantity: 0.5
         }
       ]
@@ -282,17 +292,17 @@ export const mealBank: { type: MealType; meal: Meal }[] = [
       items: [
         {
           id: '1',
-          foodItem: mockFoods.find(f => f.name === 'Chicken Breast')!,
+          foodItem: getFoodItem('Chicken Breast'),
           quantity: 1
         },
         {
           id: '2',
-          foodItem: mockFoods.find(f => f.name === 'Brown Rice (Cooked)')!,
+          foodItem: getFoodItem('Brown Rice (Cooked)'),
           quantity: 1
         },
         {
           id: '3',
-          foodItem: mockFoods.find(f => f.name === 'Broccoli')!,
+          foodItem: getFoodItem('Broccoli'),
           quantity: 1
         }
       ]
@@ -309,12 +319,12 @@ export const mealBank: { type: MealType; meal: Meal }[] = [
       items: [
         {
           id: '1',
-          foodItem: mockFoods.find(f => f.name === 'Greek Yogurt')!,
+          foodItem: getFoodItem('Greek Yogurt'),
           quantity: 0.5
         },
         {
           id: '2',
-          foodItem: mockFoods.find(f => f.name === 'Banana')!,
+          foodItem: getFoodItem('Banana'),
           quantity: 1
         }
       ]
@@ -329,7 +339,7 @@ export const mealBank: { type: MealType; meal: Meal }[] = [
       items: [
         {
           id: '1',
-          foodItem: mockFoods.find(f => f.name === 'Greek Yogurt')!,
+          foodItem: getFoodItem('Greek Yogurt'),
           quantity: 1
         }
       ]
@@ -344,7 +354,7 @@ export const mealBank: { type: MealType; meal: Meal }[] = [
       items: [
         {
           id: '1',
-          foodItem: mockFoods.find(f => f.name === 'Banana')!,
+          foodItem: getFoodItem('Banana'),
           quantity: 1
         }
       ]
@@ -361,7 +371,7 @@ export const mealBank: { type: MealType; meal: Meal }[] = [
       items: [
         {
           id: '1',
-          foodItem: mockFoods.find(f => f.name === 'Sweet Potato')!,
+          foodItem: getFoodItem('Sweet Potato'),
           quantity: 0.5
         }
       ]
@@ -376,7 +386,7 @@ export const mealBank: { type: MealType; meal: Meal }[] = [
       items: [
         {
           id: '1',
-          foodItem: mockFoods.find(f => f.name === 'Banana')!,
+          foodItem: getFoodItem('Banana'),
           quantity: 1
         }
       ]
@@ -391,7 +401,7 @@ export const mealBank: { type: MealType; meal: Meal }[] = [
       items: [
         {
           id: '1',
-          foodItem: mockFoods.find(f => f.name === 'Greek Yogurt')!,
+          foodItem: getFoodItem('Greek Yogurt'),
           quantity: 0.75
         }
       ]
@@ -408,7 +418,7 @@ export const mealBank: { type: MealType; meal: Meal }[] = [
       items: [
         {
           id: '1',
-          foodItem: mockFoods.find(f => f.name === 'Greek Yogurt')!,
+          foodItem: getFoodItem('Greek Yogurt'),
           quantity: 0.5
         }
       ]
@@ -423,12 +433,12 @@ export const mealBank: { type: MealType; meal: Meal }[] = [
       items: [
         {
           id: '1',
-          foodItem: mockFoods.find(f => f.name === 'Broccoli')!,
+          foodItem: getFoodItem('Broccoli'),
           quantity: 0.5
         },
         {
           id: '2',
-          foodItem: mockFoods.find(f => f.name === 'Olive Oil')!,
+          foodItem: getFoodItem('Olive Oil'),
           quantity: 0.25
         }
       ]
@@ -443,7 +453,7 @@ export const mealBank: { type: MealType; meal: Meal }[] = [
       items: [
         {
           id: '1',
-          foodItem: mockFoods.find(f => f.name === 'Sweet Potato')!,
+          foodItem: getFoodItem('Sweet Potato'),
           quantity: 0.3
         }
       ]
