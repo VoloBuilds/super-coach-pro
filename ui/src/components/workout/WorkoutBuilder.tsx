@@ -62,12 +62,17 @@ export function WorkoutBuilder({ initialWorkout, onSave }: WorkoutBuilderProps) 
     };
 
     const handleSaveWorkout = () => {
+        const totalSeconds = workoutExercises.reduce((total, ex) => {
+            const rest = typeof ex.restBetweenSets === 'number' ? ex.restBetweenSets : 0;
+            return total + (ex.sets.length * (rest + 30));
+        }, 0);
+        const estimatedDuration = totalSeconds > 0 ? totalSeconds / 60 : 0;
+        
         const workout = {
             name: workoutName,
             description: '', // Keep empty as we removed description
             exercises: workoutExercises,
-            estimatedDuration: workoutExercises.reduce((total, ex) => 
-                total + (ex.sets.length * (ex.restBetweenSets + 30)), 0) / 60,
+            estimatedDuration,
             ...(initialWorkout?.id && { id: initialWorkout.id })
         } as Workout;
         onSave(workout);
@@ -108,9 +113,7 @@ export function WorkoutBuilder({ initialWorkout, onSave }: WorkoutBuilderProps) 
                                         onSave={handleSaveExercise}
                                         onCancel={() => {
                                             setSelectedExercise(null);
-                                            if (workoutExercises.some(ex => ex.exerciseId === selectedExercise.id)) {
-                                                setIsDialogOpen(false);
-                                            }
+                                            setIsDialogOpen(false);
                                         }}
                                     />
                                 ) : (
@@ -147,9 +150,7 @@ export function WorkoutBuilder({ initialWorkout, onSave }: WorkoutBuilderProps) 
                                                 onSave={handleSaveExercise}
                                                 onCancel={() => {
                                                     setSelectedExercise(null);
-                                                    if (workoutExercises.some(ex => ex.exerciseId === selectedExercise.id)) {
-                                                        setIsDialogOpen(false);
-                                                    }
+                                                    setIsDialogOpen(false);
                                                 }}
                                             />
                                         ) : (
@@ -165,6 +166,7 @@ export function WorkoutBuilder({ initialWorkout, onSave }: WorkoutBuilderProps) 
                         ) : (
                             workoutExercises.map((workoutExercise) => {
                                 // For AI-generated exercises, create a minimal Exercise object
+                                const foundExercise = exercises.find(e => e.id === workoutExercise.exerciseId);
                                 const exercise = workoutExercise.name 
                                     ? { 
                                         id: workoutExercise.exerciseId,
@@ -172,7 +174,7 @@ export function WorkoutBuilder({ initialWorkout, onSave }: WorkoutBuilderProps) 
                                         category: 'other',
                                         muscleGroups: []
                                     } as Exercise
-                                    : exercises.find(e => e.id === workoutExercise.exerciseId)!;
+                                    : (foundExercise ?? { id: workoutExercise.exerciseId, name: 'Unknown Exercise', category: 'other', muscleGroups: [] });
                                 return (
                                     <div 
                                         key={workoutExercise.id} 
