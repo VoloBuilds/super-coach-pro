@@ -67,8 +67,23 @@ export class ServerCommError extends Error {
     }
 }
 
+let cachedSession: { session: any; timestamp: number } | null = null;
+const SESSION_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
 async function getAuthHeader(): Promise<Record<string, string>> {
+    const now = Date.now();
+    
+    if (cachedSession && (now - cachedSession.timestamp) < SESSION_CACHE_DURATION) {
+        const session = cachedSession.session;
+        return {
+            'Content-Type': 'application/json',
+            ...(session ? { Authorization: `Bearer ${session.access_token}` } : {})
+        };
+    }
+    
     const { data: { session } } = await supabase.auth.getSession();
+    cachedSession = { session, timestamp: now };
+    
     return {
         'Content-Type': 'application/json',
         ...(session ? { Authorization: `Bearer ${session.access_token}` } : {})
@@ -181,24 +196,44 @@ export const serverComm = {
         try {
             const headers = await getAuthHeader();
             
-            // For new meal plans, don't use the client-generated ID
-            const method = mealPlan.id && await this.getMealPlans().then(plans => 
-                plans.some(p => p.id === mealPlan.id)
-            ) ? 'PUT' : 'POST';
+            // Try PUT first if ID exists, fallback to POST if it fails
+            if (mealPlan.id) {
+                try {
+                    const response = await fetch(`${API_BASE_URL}/api/meal-plans/${mealPlan.id}`, {
+                        method: 'PUT',
+                        headers: {
+                            ...headers,
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(mealPlan)
+                    });
+                    
+                    if (response.ok) {
+                        return await response.json();
+                    }
+                    
+                    // If PUT fails with 404, fall through to POST
+                    if (response.status !== 404) {
+                        const errorData = await response.json().catch(() => null);
+                        console.error('Debug - Server error response:', errorData);
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                } catch (error) {
+                    // If it's not a 404 error, re-throw
+                    if (error instanceof Error && !error.message.includes('404')) {
+                        throw error;
+                    }
+                }
+            }
             
-            const url = method === 'PUT'
-                ? `${API_BASE_URL}/api/meal-plans/${mealPlan.id}`
-                : `${API_BASE_URL}/api/meal-plans`;
-            
-            // Remove the ID if it's a new meal plan
-            const mealPlanData = method === 'POST' ? { ...mealPlan, id: undefined } : mealPlan;
+            // POST for new meal plans or when PUT fails with 404
+            const mealPlanData = { ...mealPlan, id: undefined };
             
             console.log('Debug - Sending meal plan data:', mealPlanData);
-            console.log('Debug - Using URL:', url);
-            console.log('Debug - Using method:', method);
+            console.log('Debug - Using POST method');
             
-            const response = await fetch(url, {
-                method,
+            const response = await fetch(`${API_BASE_URL}/api/meal-plans`, {
+                method: 'POST',
                 headers: {
                     ...headers,
                     'Content-Type': 'application/json',
