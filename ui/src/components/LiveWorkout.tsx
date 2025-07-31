@@ -19,6 +19,8 @@ export function LiveWorkout({ workout, onComplete, onCancel }: LiveWorkoutProps)
     const [isResting, setIsResting] = useState(false);
     const [isPaused, setIsPaused] = useState(false);
     const [completedSets, setCompletedSets] = useState<Record<string, boolean[]>>({});
+    const [actualReps, setActualReps] = useState<string>('');
+    const [actualWeight, setActualWeight] = useState<string>('');
 
     // Initialize completed sets tracking
     useEffect(() => {
@@ -27,11 +29,11 @@ export function LiveWorkout({ workout, onComplete, onCancel }: LiveWorkoutProps)
             initial[exercise.id] = new Array(exercise.sets.length).fill(false);
         });
         setCompletedSets(initial);
-    }, [workout]);
+    }, [workout.id, workout.exercises.length]);
 
     // Timer logic
     useEffect(() => {
-        let interval: NodeJS.Timeout;
+        let interval: NodeJS.Timeout | undefined;
         
         if (!isPaused && isResting) {
             interval = setInterval(() => {
@@ -45,28 +47,53 @@ export function LiveWorkout({ workout, onComplete, onCancel }: LiveWorkoutProps)
             }, 1000);
         }
 
-        return () => clearInterval(interval);
+        return () => {
+            if (interval) clearInterval(interval);
+        };
     }, [isPaused, isResting]);
 
+    // Add bounds check before accessing currentExercise
+    if (currentExerciseIndex < 0 || currentExerciseIndex >= workout.exercises.length) {
+        return null;
+    }
+    
     const currentExercise = workout.exercises[currentExerciseIndex];
     // Get exercise info from either the workoutExercise (AI-generated) or exercises list (manually created)
     const exercise = currentExercise.name 
         ? { id: currentExercise.exerciseId, name: currentExercise.name } 
-        : exercises.find(e => e.id === currentExercise?.exerciseId);
+        : exercises.find(e => e.id === currentExercise.exerciseId);
 
     const handleCompleteSet = (actualReps?: number, actualWeight?: number) => {
-        // Update completed sets
+        // Update completed sets with deep copy
         const newCompletedSets = { ...completedSets };
+        newCompletedSets[currentExercise.id] = [...newCompletedSets[currentExercise.id]];
         newCompletedSets[currentExercise.id][currentSetIndex] = true;
         setCompletedSets(newCompletedSets);
 
-        // Update the actual reps and weight if provided
+        // Update the actual reps and weight if provided with deep copy
         if (actualReps || actualWeight) {
-            const updatedWorkout = { ...workout };
-            const set = updatedWorkout.exercises[currentExerciseIndex].sets[currentSetIndex];
-            if (actualReps) set.reps = actualReps;
-            if (actualWeight) set.weight = actualWeight;
+            const updatedWorkout = {
+                ...workout,
+                exercises: workout.exercises.map((exercise, index) => {
+                    if (index !== currentExerciseIndex) return exercise;
+                    return {
+                        ...exercise,
+                        sets: exercise.sets.map((set, idx) => {
+                            if (idx !== currentSetIndex) return set;
+                            return {
+                                ...set,
+                                reps: actualReps ?? set.reps,
+                                weight: actualWeight ?? set.weight
+                            };
+                        })
+                    };
+                })
+            };
         }
+
+        // Clear input values
+        setActualReps('');
+        setActualWeight('');
 
         // Move to rest period or next set/exercise
         if (currentSetIndex < currentExercise.sets.length - 1) {
@@ -147,7 +174,8 @@ export function LiveWorkout({ workout, onComplete, onCancel }: LiveWorkoutProps)
                                             type="number"
                                             placeholder="Actual reps"
                                             className="mt-1"
-                                            id={`actual-reps-${currentExerciseIndex}-${currentSetIndex}`}
+                                            value={actualReps}
+                                            onChange={e => setActualReps(e.target.value)}
                                         />
                                     </div>
                                     {currentSet.weightType !== 'bodyweight' && (
@@ -157,7 +185,8 @@ export function LiveWorkout({ workout, onComplete, onCancel }: LiveWorkoutProps)
                                                 type="number"
                                                 placeholder="Actual weight"
                                                 className="mt-1"
-                                                id={`actual-weight-${currentExerciseIndex}-${currentSetIndex}`}
+                                                value={actualWeight}
+                                                onChange={e => setActualWeight(e.target.value)}
                                             />
                                         </div>
                                     )}
@@ -167,11 +196,9 @@ export function LiveWorkout({ workout, onComplete, onCancel }: LiveWorkoutProps)
                             <Button 
                                 className="w-full"
                                 onClick={() => {
-                                    const repsInput = document.getElementById(`actual-reps-${currentExerciseIndex}-${currentSetIndex}`) as HTMLInputElement;
-                                    const weightInput = document.getElementById(`actual-weight-${currentExerciseIndex}-${currentSetIndex}`) as HTMLInputElement;
                                     handleCompleteSet(
-                                        repsInput?.value ? parseInt(repsInput.value) : undefined,
-                                        weightInput?.value ? parseFloat(weightInput.value) : undefined
+                                        actualReps ? parseInt(actualReps) : undefined,
+                                        actualWeight ? parseFloat(actualWeight) : undefined
                                     );
                                 }}
                             >
@@ -185,9 +212,11 @@ export function LiveWorkout({ workout, onComplete, onCancel }: LiveWorkoutProps)
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {workout.exercises.map((ex, exIndex) => {
                     // Get exercise info from either the workoutExercise (AI-generated) or exercises list (manually created)
+                    const foundExercise = exercises.find(e => e.id === ex.exerciseId);
+                    if (!ex.name && !foundExercise) return null;
                     const exerciseInfo = ex.name 
                         ? { id: ex.exerciseId, name: ex.name }
-                        : exercises.find(e => e.id === ex.exerciseId)!;
+                        : foundExercise!;
                     return (
                         <Card key={ex.id} className={exIndex === currentExerciseIndex ? 'border-primary' : ''}>
                             <CardHeader>
