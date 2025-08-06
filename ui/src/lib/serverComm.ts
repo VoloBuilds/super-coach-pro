@@ -68,21 +68,27 @@ export class ServerCommError extends Error {
 }
 
 let cachedSession: { session: any; timestamp: number } | null = null;
-const SESSION_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+const SESSION_CACHE_DURATION = 15 * 60 * 1000; // 15 minutes
+let fetchingSessionPromise: Promise<any> | null = null;
 
 async function getAuthHeader(): Promise<Record<string, string>> {
     const now = Date.now();
     
     if (cachedSession && (now - cachedSession.timestamp) < SESSION_CACHE_DURATION) {
-        const session = cachedSession.session;
         return {
             'Content-Type': 'application/json',
-            ...(session ? { Authorization: `Bearer ${session.access_token}` } : {})
+            ...(cachedSession.session ? { Authorization: `Bearer ${cachedSession.session.access_token}` } : {})
         };
     }
     
-    const { data: { session } } = await supabase.auth.getSession();
-    cachedSession = { session, timestamp: now };
+    if (!fetchingSessionPromise) {
+        fetchingSessionPromise = supabase.auth.getSession().then(({ data: { session } }) => {
+            cachedSession = { session, timestamp: Date.now() };
+            fetchingSessionPromise = null;
+            return session;
+        });
+    }
+    const session = await fetchingSessionPromise;
     
     return {
         'Content-Type': 'application/json',
@@ -112,7 +118,9 @@ export const serverComm = {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const data = await response.json();
-            console.log('Fetched workouts:', data);
+            if (process.env.NODE_ENV === 'development') {
+                console.log('Fetched workouts:', data);
+            }
             return data;
         } catch (error: unknown) {
             const message = error instanceof Error ? error.message : 'Unknown error occurred';
@@ -215,7 +223,9 @@ export const serverComm = {
                     // If PUT fails with 404, fall through to POST
                     if (response.status !== 404) {
                         const errorData = await response.json().catch(() => null);
-                        console.error('Debug - Server error response:', errorData);
+                        if (errorData) {
+                            console.error('Debug - Server error response:', errorData);
+                        }
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }
                 } catch (error) {
@@ -243,7 +253,9 @@ export const serverComm = {
             
             if (!response.ok) {
                 const errorData = await response.json().catch(() => null);
-                console.error('Debug - Server error response:', errorData);
+                if (errorData) {
+                    console.error('Debug - Server error response:', errorData);
+                }
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             return await response.json();
@@ -294,7 +306,7 @@ export const serverComm = {
     async getScheduledWorkouts(): Promise<WorkoutSchedule[]> {
         try {
             const headers = await getAuthHeader();
-            const response = await fetch(`${API_BASE_URL}/api/workout-schedules`, { headers });
+            const response = await fetch(`${API_BASE_URL}/api/workout-schedules?limit=50`, { headers });
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -303,7 +315,9 @@ export const serverComm = {
             
             // Ensure we always return an array
             if (!Array.isArray(data)) {
-                console.warn('Schedule response is not an array:', data);
+                if (process.env.NODE_ENV === 'development') {
+                    console.warn('Schedule response is not an array:', data);
+                }
                 return [];
             }
             
