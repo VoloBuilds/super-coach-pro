@@ -177,10 +177,12 @@ export default function Chat() {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-4rem)] p-4 space-y-4">
-      <h1 className="text-3xl font-bold">AI Fitness Coach</h1>
+    <div className="flex flex-col h-[calc(100vh-12rem)]">
+      <div className="flex-shrink-0 mb-4">
+        <h1 className="text-3xl font-bold">AI Fitness Coach</h1>
+      </div>
       
-      <ScrollArea className="flex-1 p-4 border rounded-lg">
+      <ScrollArea className="flex-1 border rounded-lg p-4">
         <div className="space-y-4">
           {messages.map((message, index) => (
             <div
@@ -237,17 +239,19 @@ export default function Chat() {
         </div>
       </ScrollArea>
 
-      <form onSubmit={handleSubmit} className="flex gap-2">
-        <Input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Ask about workout or meal plans..."
-          disabled={isLoading}
-        />
-        <Button type="submit" disabled={isLoading}>
-          Send
-        </Button>
-      </form>
+      <div className="flex-shrink-0 mt-4">
+        <form onSubmit={handleSubmit} className="flex gap-2">
+          <Input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Ask about workout or meal plans..."
+            disabled={isLoading}
+          />
+          <Button type="submit" disabled={isLoading}>
+            Send
+          </Button>
+        </form>
+      </div>
     </div>
   );
 } 
