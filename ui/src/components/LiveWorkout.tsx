@@ -13,6 +13,7 @@ interface LiveWorkoutProps {
 }
 
 export function LiveWorkout({ workout, onComplete, onCancel }: LiveWorkoutProps) {
+    const [liveWorkout, setLiveWorkout] = useState<Workout>(workout);
     const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
     const [currentSetIndex, setCurrentSetIndex] = useState(0);
     const [timer, setTimer] = useState(0);
@@ -23,11 +24,11 @@ export function LiveWorkout({ workout, onComplete, onCancel }: LiveWorkoutProps)
     // Initialize completed sets tracking
     useEffect(() => {
         const initial: Record<string, boolean[]> = {};
-        workout.exercises.forEach(exercise => {
+        liveWorkout.exercises.forEach(exercise => {
             initial[exercise.id] = new Array(exercise.sets.length).fill(false);
         });
         setCompletedSets(initial);
-    }, [workout]);
+    }, [liveWorkout]);
 
     // Timer logic
     useEffect(() => {
@@ -48,7 +49,7 @@ export function LiveWorkout({ workout, onComplete, onCancel }: LiveWorkoutProps)
         return () => clearInterval(interval);
     }, [isPaused, isResting]);
 
-    const currentExercise = workout.exercises[currentExerciseIndex];
+    const currentExercise = liveWorkout.exercises[currentExerciseIndex];
     // Get exercise info from either the workoutExercise (AI-generated) or exercises list (manually created)
     const exercise = currentExercise.name 
         ? { id: currentExercise.exerciseId, name: currentExercise.name } 
@@ -62,10 +63,11 @@ export function LiveWorkout({ workout, onComplete, onCancel }: LiveWorkoutProps)
 
         // Update the actual reps and weight if provided
         if (actualReps || actualWeight) {
-            const updatedWorkout = { ...workout };
+            const updatedWorkout = { ...liveWorkout };
             const set = updatedWorkout.exercises[currentExerciseIndex].sets[currentSetIndex];
             if (actualReps) set.reps = actualReps;
             if (actualWeight) set.weight = actualWeight;
+            setLiveWorkout(updatedWorkout);
         }
 
         // Move to rest period or next set/exercise
@@ -73,14 +75,14 @@ export function LiveWorkout({ workout, onComplete, onCancel }: LiveWorkoutProps)
             setIsResting(true);
             setTimer(currentExercise.restBetweenSets);
             setCurrentSetIndex(prev => prev + 1);
-        } else if (currentExerciseIndex < workout.exercises.length - 1) {
+        } else if (currentExerciseIndex < liveWorkout.exercises.length - 1) {
             setCurrentExerciseIndex(prev => prev + 1);
             setCurrentSetIndex(0);
             setIsResting(true);
             setTimer(currentExercise.restBetweenSets);
         } else {
             // Workout complete
-            onComplete(workout);
+            onComplete(liveWorkout);
         }
     };
 
@@ -97,12 +99,12 @@ export function LiveWorkout({ workout, onComplete, onCancel }: LiveWorkoutProps)
 
     const currentSet = currentExercise.sets[currentSetIndex];
     const isLastSet = currentSetIndex === currentExercise.sets.length - 1;
-    const isLastExercise = currentExerciseIndex === workout.exercises.length - 1;
+    const isLastExercise = currentExerciseIndex === liveWorkout.exercises.length - 1;
 
     return (
         <div className="space-y-6 max-w-3xl mx-auto p-4">
             <div className="flex justify-between items-center">
-                <h1 className="text-2xl font-bold">{workout.name}</h1>
+                <h1 className="text-2xl font-bold">{liveWorkout.name}</h1>
                 <div className="space-x-2">
                     <Button
                         variant="ghost"
@@ -136,7 +138,7 @@ export function LiveWorkout({ workout, onComplete, onCancel }: LiveWorkoutProps)
                         <div className="space-y-4">
                             <div className="flex justify-between items-center">
                                 <div>Set {currentSetIndex + 1} of {currentExercise.sets.length}</div>
-                                <div>Exercise {currentExerciseIndex + 1} of {workout.exercises.length}</div>
+                                <div>Exercise {currentExerciseIndex + 1} of {liveWorkout.exercises.length}</div>
                             </div>
 
                             <div className="space-y-2">
@@ -183,7 +185,7 @@ export function LiveWorkout({ workout, onComplete, onCancel }: LiveWorkoutProps)
             </Card>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {workout.exercises.map((ex, exIndex) => {
+                {liveWorkout.exercises.map((ex, exIndex) => {
                     // Get exercise info from either the workoutExercise (AI-generated) or exercises list (manually created)
                     const exerciseInfo = ex.name 
                         ? { id: ex.exerciseId, name: ex.name }
