@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -7,6 +7,8 @@ import { Workout } from "@/types/workout";
 import { MealPlan } from "@/types/diet";
 import { useToast } from "@/components/ui/use-toast";
 import { Card, CardContent } from "@/components/ui/card";
+import { MedicalDisclaimer } from "@/components/ui/MedicalDisclaimer";
+import { AlertTriangle, Info } from "lucide-react";
 
 interface Message {
   role: "user" | "assistant";
@@ -94,7 +96,21 @@ export default function Chat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showDisclaimer, setShowDisclaimer] = useState(false);
   const { toast } = useToast();
+
+  // Check if user has seen disclaimer on component mount
+  useEffect(() => {
+    const hasSeenDisclaimer = localStorage.getItem('fitness-coach-disclaimer-accepted');
+    if (!hasSeenDisclaimer) {
+      setShowDisclaimer(true);
+    }
+  }, []);
+
+  const handleDisclaimerAccept = () => {
+    localStorage.setItem('fitness-coach-disclaimer-accepted', 'true');
+    setShowDisclaimer(false);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -178,8 +194,28 @@ export default function Chat() {
 
   return (
     <div className="flex flex-col h-[calc(100vh-12rem)]">
+      {/* Medical Disclaimer Modal */}
+      <MedicalDisclaimer 
+        isOpen={showDisclaimer}
+        onAccept={handleDisclaimerAccept}
+      />
+
       <div className="flex-shrink-0 mb-4">
         <h1 className="text-3xl font-bold">AI Fitness Coach</h1>
+        
+        {/* Permanent Medical Disclaimer Banner */}
+        <div className="mt-3 bg-red-50 border border-red-200 rounded-lg p-3">
+          <div className="flex items-start gap-2">
+            <AlertTriangle className="h-4 w-4 text-red-600 mt-0.5 flex-shrink-0" />
+            <div className="text-sm">
+              <span className="font-semibold text-red-900">Medical Disclaimer: </span>
+              <span className="text-red-800">
+                This AI provides general fitness information only and is not medical advice. 
+                Always consult healthcare professionals before starting any exercise or diet program.
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
       
       <ScrollArea className="flex-1 border rounded-lg p-4">
@@ -239,7 +275,17 @@ export default function Chat() {
         </div>
       </ScrollArea>
 
-      <div className="flex-shrink-0 mt-4">
+      <div className="flex-shrink-0 mt-4 space-y-3">
+        {/* Bottom disclaimer reminder */}
+        <div className="bg-amber-50 border border-amber-200 rounded-md p-2">
+          <div className="flex items-center gap-2">
+            <Info className="h-3 w-3 text-amber-600 flex-shrink-0" />
+            <span className="text-xs text-amber-800">
+              Remember: This is not medical advice. Consult professionals for health decisions.
+            </span>
+          </div>
+        </div>
+        
         <form onSubmit={handleSubmit} className="flex gap-2">
           <Input
             value={input}

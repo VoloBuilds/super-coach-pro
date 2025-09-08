@@ -6,6 +6,7 @@ export interface Env {
     SUPABASE_SERVICE_ROLE_KEY: string;
     DB: D1Database;
     OPENAI_API_KEY: string;
+    RATE_LIMIT_KV?: KVNamespace;
 }
 
 export interface WorkoutData {

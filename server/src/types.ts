@@ -1,5 +1,6 @@
 import { User } from '@supabase/supabase-js';
 import { WorkoutDB, MealPlanDB, Env } from './db';
+import { RateLimiter } from './rateLimit';
 
 export interface HandlerContext<T = unknown> {
   db: WorkoutDB & MealPlanDB;
@@ -7,6 +8,7 @@ export interface HandlerContext<T = unknown> {
   body: T;
   params: Record<string, string>;
   env: Env;
+  rateLimiter?: RateLimiter;
 }
 
 export interface RouteHandler<T = unknown> {

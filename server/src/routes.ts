@@ -2,6 +2,7 @@ import { Route } from './types';
 import { workoutHandlers } from './handlers/workouts';
 import { mealPlanHandlers } from './handlers/meal-plans';
 import { chatHandler } from './handlers/chat';
+import { rateLimitStatusHandler } from './handlers/rate-limit-status';
 import { WorkoutData, MealPlanData, WorkoutScheduleData } from './db';
 import { workoutScheduleHandlers } from 'handlers/workout-schedules';
 
@@ -87,5 +88,9 @@ export const routes: (Route<any>)[] = [
   {
     path: '/api/chat',
     handler: chatHandler
+  } as Route<any>,
+  {
+    path: '/api/rate-limit-status',
+    handler: rateLimitStatusHandler
   } as Route<any>
 ]; 
